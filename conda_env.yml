@@ -1,0 +1,11 @@
+name: test
+channels:
+  - anaconda
+  - conda-forge
+  - cogsci
+  - defaults
+dependencies:
+  - tensorflow
+  - gym
+  - pygame
+  - wandb
