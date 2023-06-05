@@ -43,7 +43,7 @@ After setting up the basic rules for the game I created a brute force algorithm,
 Average Brute Force (Turn: 32.08 Used: 10.74 Not used: 21.34
 
 ## Rewards
-To get an idea about if this is bad or good here some information about the rewards:
-10 or fewer: Large treasure chest
-11 to 24: medium treasure chest
-25 or more: small tresure chest
+To get an idea about if this is bad or good here some information about the rewards:<br>
+10 or fewer: Large treasure chest<br>
+11 to 24: medium treasure chest<br>
+25 or more: small tresure chest<br>
