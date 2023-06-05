@@ -2,7 +2,7 @@
 In a computer game I liked to play as a kid there exist a minigame called Jigsaw. It is hard to do efficiently. The reward varies dependent on how much steps you need to solve, so it will be interesting to find a solver. It is a tetris like puzzle which can be solved easily using heuristics. For learning purpose I will use reinforcement learning
 
 ## Rules
-The Field consists of 4 rows and 6 cols and is initialized empty
+The Field consists of 4 rows and 6 cols and is initialized empty<br>
 o o o o o o<br>
 o o o o o o<br>
 o o o o o o<br>
