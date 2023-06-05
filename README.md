@@ -3,43 +3,43 @@ In a computer game I liked to play as a kid there exist a minigame called Jigsaw
 
 ## Rules
 The Field consists of 4 rows and 6 cols and is initialized empty
-o o o o o o
-o o o o o o
-o o o o o o
-o o o o o o
+o o o o o o<br>
+o o o o o o<br>
+o o o o o o<br>
+o o o o o o<br>
 
-There are 6 possible puzzle pieces you can get
-1)
-x
-x x
+There are 6 possible puzzle pieces you can get<br>
+1)<br>
+x<br>
+x x<br>
 
-2)
-x x
-  x
+2)<br>
+x x<br>
+  x<br>
 
-3)
-x x
-x x
+3)<br>
+x x<br>
+x x<br>
 
-4)
-x
-x
-x
+4)<br>
+x<br>
+x<br>
+x<br>
 
-5)
-x x
-  x x
+5)<br>
+x x<br>
+  x x<br>
 
-6)
-x
+6)<br>
+x<br>
 
-At every turn you get one of these randomly.
-You can place it on a empty position on the field or throw it away and start a new turn.
-The game is done if the field is completely filled with forms with nothing empty.
+At every turn you get one of these randomly.<br>
+You can place it on a empty position on the field or throw it away and start a new turn.<br>
+The game is done if the field is completely filled with forms with nothing empty.<br>
 
 
 ## Brute force
-After setting up the basic rules for the game I created a brute force algorithm, which received following statistics on 100 runs:
+After setting up the basic rules for the game I created a brute force algorithm, which received following statistics on 100 runs:<br>
 Average Brute Force (Turn: 32.08 Used: 10.74 Not used: 21.34
 
 ## Rewards
