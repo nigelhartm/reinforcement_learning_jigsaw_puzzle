@@ -15,7 +15,7 @@ x x<br>
 
 2)<br>
 x x<br>
-&nbsp;&nbsp;x<br>
+&emsp;&emsp;x<br>
 
 3)<br>
 x x<br>
@@ -28,7 +28,7 @@ x<br>
 
 5)<br>
 x x<br>
-&nbsp;&nbsp;x x<br>
+&emsp;&emsp;x x<br>
 
 6)<br>
 x<br>
