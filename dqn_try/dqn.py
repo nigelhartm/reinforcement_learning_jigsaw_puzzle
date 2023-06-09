@@ -92,8 +92,8 @@ def train(model):#, start):
     replay_memory = []
 
     # initial action is do nothing
-    #action = torch.zeros([model.number_of_actions], dtype=torch.float32)
-    #action[0] = 1
+    # action = torch.zeros([model.number_of_actions], dtype=torch.float32)
+    # action[0] = 1
     # init step is get a new piece
     action = np.array([0, 0, 0, 0, 0, 0,
                        0, 0, 0, 0, 0, 0,
@@ -120,6 +120,7 @@ def train(model):#, start):
     # main infinite loop
     while iteration < model.number_of_iterations:
         # get output from the neural network
+        print("here before")
         output = model(state)[0]
 
         # initialize action
@@ -147,7 +148,7 @@ def train(model):#, start):
         #state_1 = #torch.cat((state.squeeze(0)[1:, :, :], image_data_1)).unsqueeze(0)
         game_state.action_converter(action)
         state_reward = game_state.get_state()
-        state_1= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
+        state_1= torch.from_numpy(state_reward[0].astype(np.float32))
         reward = state_reward[1]
         finished = state_reward[2]
 
@@ -181,7 +182,7 @@ def train(model):#, start):
 
         # get output for the next state
         print("here")
-        output_1_batch = model(state_1_batch)
+        output_1_batch = model(state_1_batch.unsqueeze(0))[0]
 
         # set y_j to r_j for terminal state, otherwise to r_j + gamma*max(Q)
         y_batch = torch.cat(tuple(reward_batch[i] if minibatch[i][4]
