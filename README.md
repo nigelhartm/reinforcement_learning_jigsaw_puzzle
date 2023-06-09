@@ -47,3 +47,6 @@ To get an idea about if this is bad or good here some information about the rewa
 10 or fewer: Large treasure chest<br>
 11 to 24: medium treasure chest<br>
 25 or more: small tresure chest<br>
+
+## Help
+https://www.toptal.com/deep-learning/pytorch-reinforcement-learning-tutorial

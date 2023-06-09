@@ -13,40 +13,86 @@ class jigsaw_game:
     board = None
     rows = None
     cols = None
+    piece = None
+    reward = None
+    terminal = None
     
     # Constructor -> empty field
     def __init__(self):
         self.board = np.zeros((4,6), dtype=int)
         self.rows = self.board.shape[0]
         self.cols = self.board.shape[1]
+        self.new_piece()
+        self.reward = 0
+        self.finished = False
 
     # Check if game is solved return True if it is
     def solved(self):
         if(np.array_equal(self.board, np.ones((4,6), dtype=int))):
+            self.reward = 1
+            self.finished = True
             return True
         else:
             return False
     
     # Check if putting piece at x, y is valid True if it is
-    def valid_move(self, act_piece, x_origin, y_origin):
-        board_piece_area = self.board[y_origin:y_origin+act_piece.rows, x_origin:x_origin+act_piece.cols]
-        if(np.max(np.add(board_piece_area, act_piece.form)) == 1):
+    def valid_move(self, x_origin, y_origin):
+        board_piece_area = self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols]
+        if(np.max(np.add(board_piece_area, self.piece.form)) == 1):
             return True
         else:
             return False
     
     # check if move is valid and move -> True if worked
-    def move(self, act_piece, x_origin, y_origin):
+    def move(self, x_origin, y_origin):
+        print(self.get_state())
         try:
-            possible_move = self.valid_move(act_piece, x_origin, y_origin)
+            possible_move = self.valid_move(x_origin, y_origin)
             if(possible_move):
-                self.board[y_origin:y_origin+act_piece.rows, x_origin:x_origin+act_piece.cols] = np.add(self.board[y_origin:y_origin+act_piece.rows, x_origin:x_origin+act_piece.cols], act_piece.form)
+                self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols] = np.add(self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols], self.piece.form)
+                self.reward = 0.1
+                print("Piece added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
+                self.new_piece
                 return True
             else:
+                print("Piece not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
+                self.reward = -0.1
                 return False
         except:
+            print("Piece not added (Reason out of Field at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
+            self.reward = -0.1
             return False
+    
+    def new_piece(self):
+        self.piece = jigsaw_piece()
+    
+    def reset(self):
+        self.__init__
 
+    def get_state(self):
+        piece_buffer = np.zeros((4,4), dtype=int)
+        piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols] = np.add(piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols], self.piece.form)
+        reward_last_action = self.reward
+        state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
+        self.reward = 0
+        finish = self.finished
+        if(self.solved()):
+            self.reset()
+        return [state, reward_last_action, finish]
+    
+    def action_converter(self, action):
+        action_index = int(np.where(action == 1)[0])
+        print(action_index)
+        # Move to position
+        if(action_index<24):
+            row = int(action_index/6)
+            col = int(action_index%6)
+            self.move(col, row)
+        # do something else
+        else:
+            # get new piece
+            if(action_index == 24):
+                self.piece = jigsaw_piece()
 
 
 
@@ -97,25 +143,20 @@ def run_brute_force():
     while(act_jigsaw_game.solved() == False):
         turn += 1
         
-        act_jigsaw_piece = jigsaw_piece() # get new piece
         worked = False
         
         for y in range(0, act_jigsaw_game.rows):
             for x in range(0, act_jigsaw_game.cols):
-                if(act_jigsaw_game.move(act_jigsaw_piece, x, y) == True):
+                if(act_jigsaw_game.move(x, y) == True):
                     worked = True
                     used +=1
-                    #print("Piece added.")
-                    #print(act_jigsaw_piece.form)
-                    #print(act_jigsaw_game.board)
                     break
             if worked == True:
                 break
         if(worked == False):
             not_used += 1
-            #print("Piece not added.")
-            #print(act_jigsaw_piece.form)
-    #print(act_jigsaw_game.board)
+        act_jigsaw_game.new_piece()
+    act_jigsaw_game.action_converter()
     return(turn,used,not_used)
 
 """
@@ -137,18 +178,19 @@ class ai_jigsaw_game(gym.Env):
         return  self._get_obs(), reward, done, info
     def render(self):
 """     
-
+"""
 def main():
     #statistic brute force
     g_turn = 0
     g_used = 0
     g_not_used = 0
-    for i in range(0, 100):
+    for i in range(0, 1):
         turn, used, not_used = run_brute_force()
         g_turn += turn
         g_used += used
         g_not_used += not_used
-    print("Average Brute Force (Turn: " + str(g_turn/100) + " Used: " + str(g_used/100) + " Not used: " + str(g_not_used/100))
+    print("Average Brute Force (Turn: " + str(g_turn/1) + " Used: " + str(g_used/1) + " Not used: " + str(g_not_used/1))
 
 
 main()
+"""
