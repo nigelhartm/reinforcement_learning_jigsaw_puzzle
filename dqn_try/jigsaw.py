@@ -52,7 +52,7 @@ class jigsaw_game:
                 self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols] = np.add(self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols], self.piece.form)
                 self.reward = 0.1
                 print("Piece added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
-                self.new_piece
+                self.new_piece()
                 return True
             else:
                 print("Piece not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
@@ -82,7 +82,7 @@ class jigsaw_game:
     
     def action_converter(self, action):
         action_index = int(np.where(action == 1)[0])
-        print(action_index)
+        #print(action_index)
         # Move to position
         if(action_index<24):
             row = int(action_index/6)

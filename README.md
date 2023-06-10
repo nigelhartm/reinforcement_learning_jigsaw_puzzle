@@ -54,3 +54,5 @@ To get an idea about if this is bad or good here some information about the rewa
 
 ## Help
 https://www.toptal.com/deep-learning/pytorch-reinforcement-learning-tutorial
+
+https://pub.towardsai.net/understanding-tensor-dimensions-in-deep-learning-models-with-pytorch-4ee828693826
