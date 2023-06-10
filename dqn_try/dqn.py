@@ -109,6 +109,7 @@ def train(model, start):
         state_1= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
         reward = state_reward[1]
         finished = state_reward[2]
+        action_cnt = state_reward[3]
 
         action = action.unsqueeze(0)
         reward = torch.from_numpy(np.array([reward], dtype=np.float32)).unsqueeze(0)
@@ -169,6 +170,9 @@ def train(model, start):
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
         if finished:
             solved_cnt=solved_cnt+1
+            print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
+            print("in -> " + str(action_cnt))
+            print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
         print("iteration:", iteration, "elapsed time:", time.time()-start, "epsilon:", epsilon, "action:",
               action_index.cpu().detach().numpy(), "reward:", reward.numpy()[0][0], "Q max:",
               np.max(output.cpu().detach().numpy()), "Solved puzzles:", solved_cnt, "\n")
