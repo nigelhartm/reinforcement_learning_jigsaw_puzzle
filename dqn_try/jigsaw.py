@@ -15,8 +15,7 @@ class jigsaw_game:
     cols = None
     piece = None
     reward = None
-    terminal = None
-    action_cnt = 0
+    finished = None
     
     # Constructor -> empty field
     def __init__(self):
@@ -26,7 +25,6 @@ class jigsaw_game:
         self.new_piece()
         self.reward = 0
         self.finished = False
-        self.action_cnt= 0
 
     # Check if game is solved return True if it is
     def solved(self):
@@ -47,7 +45,6 @@ class jigsaw_game:
     
     # check if move is valid and move -> True if worked
     def move(self, x_origin, y_origin):
-        print(self.get_state())
         try:
             possible_move = self.valid_move(x_origin, y_origin)
             if(possible_move):
@@ -69,7 +66,12 @@ class jigsaw_game:
         self.piece = jigsaw_piece()
     
     def reset(self):
-        self.__init__
+        self.board = np.zeros((4,6), dtype=int)
+        self.rows = self.board.shape[0]
+        self.cols = self.board.shape[1]
+        self.new_piece()
+        self.reward = 0
+        self.finished = False
 
     def get_state(self):
         piece_buffer = np.zeros((4,4), dtype=int)
@@ -77,14 +79,13 @@ class jigsaw_game:
         reward_last_action = self.reward
         state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
         self.reward = 0
-        finish = self.finished
-        actcnt = self.action_cnt
+        finish = False
         if(self.solved()):
+            finish = True
             self.reset()
-        return [state, reward_last_action, finish, actcnt]
+        return [state, reward_last_action, finish]
     
     def action_converter(self, action):
-        self.action_cnt= self.action_cnt+1
         action_index = int(np.where(action == 1)[0])
         #print(action_index)
         # Move to position

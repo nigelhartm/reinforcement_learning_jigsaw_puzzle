@@ -32,24 +32,16 @@ class NeuralNetwork(nn.Module):
         self.fc5 = nn.Linear(512, self.number_of_actions)
 
     def forward(self, x):
-        #print("Froward:")
-        #print(x.size())
         out = self.conv1(x)
-        #print(out.size())
         out = self.relu1(out)
         out = self.conv2(out)
-        #print(out.size())
         out = self.relu2(out)
         out = self.conv3(out)
-        #print(out.size())
         out = self.relu3(out)
         out = out.view(out.size()[0], -1)
-        #print(out.size())
         out = self.fc4(out)
-        #print(out.size())
         out = self.relu4(out)
         out = self.fc5(out)
-        #print(out.size())
         return out
 
 
@@ -60,6 +52,7 @@ def init_weights(m):
 
 def train(model, start):
     solved_cnt = 0
+    action_cnt = 0
     optimizer = optim.Adam(model.parameters(), lr=1e-6)
     criterion = nn.MSELoss() # initialize mean squared error loss
     game_state = jigsaw_game() # instantiate game
@@ -87,6 +80,7 @@ def train(model, start):
         # get output from the neural network
         output = model(state)[0]
         # initialize action
+        action_cnt+=1
         action = torch.zeros([model.number_of_actions], dtype=torch.float32)
         if torch.cuda.is_available():  # put on GPU if CUDA is available
             action = action.cuda()
@@ -109,7 +103,6 @@ def train(model, start):
         state_1= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
         reward = state_reward[1]
         finished = state_reward[2]
-        action_cnt = state_reward[3]
 
         action = action.unsqueeze(0)
         reward = torch.from_numpy(np.array([reward], dtype=np.float32)).unsqueeze(0)
@@ -173,6 +166,9 @@ def train(model, start):
             print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
             print("in -> " + str(action_cnt))
             print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
+            action_cnt = 0
+            state_reward = game_state.get_state()
+            state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
         print("iteration:", iteration, "elapsed time:", time.time()-start, "epsilon:", epsilon, "action:",
               action_index.cpu().detach().numpy(), "reward:", reward.numpy()[0][0], "Q max:",
               np.max(output.cpu().detach().numpy()), "Solved puzzles:", solved_cnt, "\n")
