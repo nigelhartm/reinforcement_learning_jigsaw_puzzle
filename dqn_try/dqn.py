@@ -51,6 +51,8 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 def train(model, start):
+    stats_file = open("pretrained_model/stats.csv", "w")
+    stats_file.write("puzzle,actions\n")
     solved_cnt = 0
     action_cnt = 0
     optimizer = optim.Adam(model.parameters(), lr=1e-6)
@@ -130,7 +132,6 @@ def train(model, start):
             reward_batch = reward_batch.cuda()
             state_1_batch = state_1_batch.cuda()
 
-        print(state_1_batch.unsqueeze(0))
         # get output for the next state
         output_1_batch = model(state_1_batch) #.unsqueeze(0))??????????????????????????????????????????????????????????????????????????
 
@@ -166,12 +167,15 @@ def train(model, start):
             print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
             print("in -> " + str(action_cnt))
             print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
+            stats_file.write(str(solved_cnt) + "," + str(action_cnt) + "\n")
+            stats_file.flush()
             action_cnt = 0
             state_reward = game_state.get_state()
             state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
         print("iteration:", iteration, "elapsed time:", time.time()-start, "epsilon:", epsilon, "action:",
               action_index.cpu().detach().numpy(), "reward:", reward.numpy()[0][0], "Q max:",
               np.max(output.cpu().detach().numpy()), "Solved puzzles:", solved_cnt, "\n")
+    stats_file.close()
 
 """
 def test(model):

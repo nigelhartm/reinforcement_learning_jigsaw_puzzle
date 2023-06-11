@@ -29,7 +29,7 @@ class jigsaw_game:
     # Check if game is solved return True if it is
     def solved(self):
         if(np.array_equal(self.board, np.ones((4,6), dtype=int))):
-            self.reward = 1
+            self.reward = 10
             self.finished = True
             return True
         else:
@@ -49,7 +49,7 @@ class jigsaw_game:
             possible_move = self.valid_move(x_origin, y_origin)
             if(possible_move):
                 self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols] = np.add(self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols], self.piece.form)
-                self.reward = 0.1
+                self.reward = 1
                 print("Piece added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
                 self.new_piece()
                 return True
@@ -64,6 +64,7 @@ class jigsaw_game:
     
     def new_piece(self):
         self.piece = jigsaw_piece()
+        #self.reward = -0.1 wenn hier dann wird auch erfolg bestraft
     
     def reset(self):
         self.board = np.zeros((4,6), dtype=int)
@@ -78,6 +79,7 @@ class jigsaw_game:
         piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols] = np.add(piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols], self.piece.form)
         reward_last_action = self.reward
         state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
+        print(state)
         self.reward = 0
         finish = False
         if(self.solved()):
@@ -97,7 +99,8 @@ class jigsaw_game:
         else:
             # get new piece
             if(action_index == 24):
-                self.piece = jigsaw_piece()
+                self.new_piece()
+                self.reward = -0.1
 
 
 
