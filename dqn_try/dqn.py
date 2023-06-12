@@ -17,7 +17,7 @@ class NeuralNetwork(nn.Module):
         self.gamma = 0.99
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.1
-        self.number_of_iterations = 2000000
+        self.number_of_iterations = 20000000
         self.replay_memory_size = 10000
         self.minibatch_size = 32
 
@@ -25,20 +25,25 @@ class NeuralNetwork(nn.Module):
         self.relu1 = nn.ReLU(inplace=True)
         self.conv2 = nn.Conv2d(32, 64, 2, 1)
         self.relu2 = nn.ReLU(inplace=True)
-        self.conv3 = nn.Conv2d(64, 128, 2, 1)
-        self.relu3 = nn.ReLU(inplace=True)
-        self.fc4 = nn.Linear(7, 512)
+        #self.conv3 = nn.Conv2d(64, 128, 2, 1)
+        #self.relu3 = nn.ReLU(inplace=True)
+        #self.fc4 = nn.Linear(896, 300)
+        self.fc4 = nn.Linear(1024, 300)
         self.relu4 = nn.ReLU(inplace=True)
-        self.fc5 = nn.Linear(512, self.number_of_actions)
+        self.fc5 = nn.Linear(300, self.number_of_actions)
 
     def forward(self, x):
+        #print("T03")
+        #print(x.shape)
         out = self.conv1(x)
         out = self.relu1(out)
         out = self.conv2(out)
         out = self.relu2(out)
-        out = self.conv3(out)
-        out = self.relu3(out)
+        #out = self.conv3(out)
+        #out = self.relu3(out)
+        #print(out.size())
         out = out.view(out.size()[0], -1)
+        #print(out.size())
         out = self.fc4(out)
         out = self.relu4(out)
         out = self.fc5(out)
@@ -53,6 +58,7 @@ def init_weights(m):
 def train(model, start):
     stats_file = open("pretrained_model/stats.csv", "w")
     stats_file.write("puzzle,actions\n")
+    stats_file.flush()
     solved_cnt = 0
     action_cnt = 0
     optimizer = optim.Adam(model.parameters(), lr=1e-6)
@@ -79,7 +85,10 @@ def train(model, start):
 
     # main infinite loop
     while iteration < model.number_of_iterations:
+        state=state.unsqueeze(0)
         # get output from the neural network
+        #print("T00")
+        #print(state.shape)
         output = model(state)[0]
         # initialize action
         action_cnt+=1
@@ -119,22 +128,28 @@ def train(model, start):
         epsilon = epsilon_decrements[iteration]
 
         # sample random minibatch
-        minibatch = random.sample(replay_memory, 1) #min(len(replay_memory), model.minibatch_size))???????????????????????????????
+        minibatch = random.sample(replay_memory, min(len(replay_memory), model.minibatch_size))#???????????????????????????????
 
         # unpack minibatch
         state_batch = torch.cat(tuple(d[0] for d in minibatch))
         action_batch = torch.cat(tuple(d[1] for d in minibatch))
         reward_batch = torch.cat(tuple(d[2] for d in minibatch))
         state_1_batch = torch.cat(tuple(d[3] for d in minibatch))
+
         if torch.cuda.is_available():  # put on GPU if CUDA is available
             state_batch = state_batch.cuda()
             action_batch = action_batch.cuda()
             reward_batch = reward_batch.cuda()
             state_1_batch = state_1_batch.cuda()
-
+        
+        #print("T01")
+        state_1_batch = state_1_batch.unsqueeze(1)
+        #print(state_1_batch)
+        #print(state_1_batch.shape)
         # get output for the next state
         output_1_batch = model(state_1_batch) #.unsqueeze(0))??????????????????????????????????????????????????????????????????????????
-
+        #print("T02")
+        
         # set y_j to r_j for terminal state, otherwise to r_j + gamma*max(Q)
         y_batch = torch.cat(tuple(reward_batch[i] if minibatch[i][4]
                                   else reward_batch[i] + model.gamma * torch.max(output_1_batch[i])
@@ -164,17 +179,16 @@ def train(model, start):
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
         if finished:
             solved_cnt=solved_cnt+1
-            print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
+            print("FINISHED:")
             print("in -> " + str(action_cnt))
-            print(":::::::::::::::::::::::::FINISHED:::::::::::::::::::::::::")
             stats_file.write(str(solved_cnt) + "," + str(action_cnt) + "\n")
             stats_file.flush()
             action_cnt = 0
             state_reward = game_state.get_state()
             state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
-        print("iteration:", iteration, "elapsed time:", time.time()-start, "epsilon:", epsilon, "action:",
-              action_index.cpu().detach().numpy(), "reward:", reward.numpy()[0][0], "Q max:",
-              np.max(output.cpu().detach().numpy()), "Solved puzzles:", solved_cnt, "\n")
+        print("iteration:", iteration, "\telapsed time:", time.time()-start, "\tepsilon:", epsilon, "\taction:",
+              action_index.cpu().detach().numpy(), "\treward:", reward.numpy()[0][0], "\tQ max:",
+              np.max(output.cpu().detach().numpy()), "\tSolved puzzles:", solved_cnt)
     stats_file.close()
 
 """

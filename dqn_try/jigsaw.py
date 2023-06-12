@@ -29,7 +29,7 @@ class jigsaw_game:
     # Check if game is solved return True if it is
     def solved(self):
         if(np.array_equal(self.board, np.ones((4,6), dtype=int))):
-            self.reward = 10
+            self.reward = 100
             self.finished = True
             return True
         else:
@@ -49,16 +49,16 @@ class jigsaw_game:
             possible_move = self.valid_move(x_origin, y_origin)
             if(possible_move):
                 self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols] = np.add(self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols], self.piece.form)
-                self.reward = 1
-                print("Piece added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
+                self.reward = 10
+                print("Piece added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
                 self.new_piece()
                 return True
             else:
-                print("Piece not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
+                print("Piece not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
                 self.reward = -0.1
                 return False
         except:
-            print("Piece not added (Reason out of Field at position x="+ str(x_origin) + " y=" + str(y_origin) + ")\n")
+            print("Piece not added (Reason out of Field at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
             self.reward = -0.1
             return False
     
