@@ -18,9 +18,8 @@ class NeuralNetwork(nn.Module):
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.1
         self.number_of_iterations = 20000000
-        self.replay_memory_size = 1000
-        self.minibatch_size = 16
-
+        self.replay_memory_size = 10000
+        self.minibatch_size = 32
         """
         self.conv1 = nn.Conv2d(1, 32, 2, 1)
         self.relu1 = nn.ReLU(inplace=True)
@@ -39,11 +38,9 @@ class NeuralNetwork(nn.Module):
         self.relu1 = nn.ReLU(inplace=True)
         self.fc2 = nn.Linear(160, 160)
         self.relu2 = nn.ReLU(inplace=True)
-        self.fc4 = nn.Linear(160, 80)
-        self.relu4 = nn.ReLU(inplace=True)
-        self.fc5 = nn.Linear(80, 80)
-        self.relu5 = nn.ReLU(inplace=True)
-        self.fc6 = nn.Linear(80, self.number_of_actions)
+        self.fc3 = nn.Linear(160, 80)
+        self.relu3 = nn.ReLU(inplace=True)
+        self.fc4 = nn.Linear(80, self.number_of_actions)
 
     def forward(self, x):
         """
@@ -70,11 +67,9 @@ class NeuralNetwork(nn.Module):
         out = self.relu1(out)
         out = self.fc2(out)
         out = self.relu2(out)
+        out = self.fc3(out)
+        out = self.relu3(out)
         out = self.fc4(out)
-        out = self.relu4(out)
-        out = self.fc5(out)
-        out = self.relu5(out)
-        out = self.fc6(out)
         return out
 
 
@@ -84,11 +79,19 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 def train(model, start):
-    stats_file = open("pretrained_model/stats.csv", "w")
-    stats_file.write("puzzle,actions\n")
+    stats_file = open("pretrained_model/stats.tsv", "w")
+    puzzlestats_file = open("pretrained_model/puzzle_stats.tsv", "w")
+
+    puzzlestats_file.write("puzzle\tactions\n")
+    puzzlestats_file.flush()
+
+    stats_file.write("iteration\trewards\n")
     stats_file.flush()
+
     solved_cnt = 0
     action_cnt = 0
+    iter_reward = 0
+
     optimizer = optim.Adam(model.parameters(), lr=1e-6)
     criterion = nn.MSELoss() # initialize mean squared error loss
     game_state = jigsaw_game() # instantiate game
@@ -205,12 +208,19 @@ def train(model, start):
 
         if iteration % 25000 == 0:
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
+
+        iter_reward += reward
+        ## print overall reward every 10000 steps
+        if iteration % 10000 == 0:
+            stats_file.write(str(iteration) + "\t" + str(iter_reward[0]) + "\n")
+            stats_file.flush()
+            iter_reward = 0
         if finished:
             solved_cnt=solved_cnt+1
             print("FINISHED:")
             print("in -> " + str(action_cnt))
-            stats_file.write(str(solved_cnt) + "," + str(action_cnt) + "\n")
-            stats_file.flush()
+            puzzlestats_file.write(str(solved_cnt) + "\t" + str(action_cnt) + "\n")
+            puzzlestats_file.flush()
             action_cnt = 0
             state_reward = game_state.get_state()
             state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
@@ -221,17 +231,21 @@ def train(model, start):
 
 """
 def test(model):
-    game_state = GameState()
+    game_state = jigsaw_game()
 
-    # initial action is do nothing
-    action = torch.zeros([model.number_of_actions], dtype=torch.float32)
-    action[0] = 1
-    image_data, reward, terminal = game_state.frame_step(action)
-    image_data = resize_and_bgr2gray(image_data)
-    image_data = image_to_tensor(image_data)
-    state = torch.cat((image_data, image_data, image_data, image_data)).unsqueeze(0)
+    # initial action is get a new piece
+    action = np.array([0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0,
+                       0, 0, 0, 0, 0, 0,
+                       1])
+    game_state.action_converter(action)
+    state_reward = game_state.get_state()
+    state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
+    reward = state_reward[1]
+    finished = state_reward[2]
 
-    while True:
+    while finished !=TRUE:
         # get output from the neural network
         output = model(state)[0]
 
@@ -253,22 +267,20 @@ def test(model):
 
         # set state to be state_1
         state = state_1
-"""
+    """
 
 def main(mode):
     cuda_is_available = torch.cuda.is_available()
-
-    """if mode == 'test':
+    """
+    if mode == 'test':
         model = torch.load(
             'pretrained_model/current_model_2000000.pth',
             map_location='cpu' if not cuda_is_available else None
         ).eval()
-
         if cuda_is_available:  # put on GPU if CUDA is available
             model = model.cuda()
-
-        test(model)"""
-    #elif
+        test(model)
+    #elif"""
     if mode == 'train':
         if not os.path.exists('pretrained_model/'):
             os.mkdir('pretrained_model/')
