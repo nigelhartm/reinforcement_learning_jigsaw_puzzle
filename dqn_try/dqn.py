@@ -18,35 +18,63 @@ class NeuralNetwork(nn.Module):
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.1
         self.number_of_iterations = 20000000
-        self.replay_memory_size = 10000
-        self.minibatch_size = 32
+        self.replay_memory_size = 1000
+        self.minibatch_size = 16
 
+        """
         self.conv1 = nn.Conv2d(1, 32, 2, 1)
         self.relu1 = nn.ReLU(inplace=True)
         self.conv2 = nn.Conv2d(32, 64, 2, 1)
         self.relu2 = nn.ReLU(inplace=True)
-        #self.conv3 = nn.Conv2d(64, 128, 2, 1)
-        #self.relu3 = nn.ReLU(inplace=True)
-        #self.fc4 = nn.Linear(896, 300)
-        self.fc4 = nn.Linear(1024, 300)
+        self.conv3 = nn.Conv2d(64, 128, 2, 1)
+        self.relu3 = nn.ReLU(inplace=True)
+        self.fc4 = nn.Linear(896, 896)
+        #self.fc4 = nn.Linear(1024, 300)
         self.relu4 = nn.ReLU(inplace=True)
-        self.fc5 = nn.Linear(300, self.number_of_actions)
+        self.fc5 = nn.Linear(896, 400)
+        self.relu5 = nn.ReLU(inplace=True)
+        self.fc6 = nn.Linear(400, self.number_of_actions)
+        """
+        self.fc1 = nn.Linear(40, 160)
+        self.relu1 = nn.ReLU(inplace=True)
+        self.fc2 = nn.Linear(160, 160)
+        self.relu2 = nn.ReLU(inplace=True)
+        self.fc4 = nn.Linear(160, 80)
+        self.relu4 = nn.ReLU(inplace=True)
+        self.fc5 = nn.Linear(80, 80)
+        self.relu5 = nn.ReLU(inplace=True)
+        self.fc6 = nn.Linear(80, self.number_of_actions)
 
     def forward(self, x):
+        """
         #print("T03")
         #print(x.shape)
         out = self.conv1(x)
         out = self.relu1(out)
         out = self.conv2(out)
         out = self.relu2(out)
-        #out = self.conv3(out)
-        #out = self.relu3(out)
+        out = self.conv3(out)
+        out = self.relu3(out)
         #print(out.size())
         out = out.view(out.size()[0], -1)
         #print(out.size())
         out = self.fc4(out)
         out = self.relu4(out)
         out = self.fc5(out)
+        out = self.relu5(out)
+        out = self.fc6(out)
+        return out
+        """
+        out = x.view(x.size()[0], -1)
+        out = self.fc1(out)
+        out = self.relu1(out)
+        out = self.fc2(out)
+        out = self.relu2(out)
+        out = self.fc4(out)
+        out = self.relu4(out)
+        out = self.fc5(out)
+        out = self.relu5(out)
+        out = self.fc6(out)
         return out
 
 
