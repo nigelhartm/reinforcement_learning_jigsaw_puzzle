@@ -13,9 +13,8 @@ o o o o o o<br>
 o o o o o o<br>
 
 There are 6 possible puzzle pieces you can get<br>
-1)<br>
-x<br>
-x x<br>
+### 1
+![alt text](img/pieces/1.png)
 
 2)<br>
 x x<br>
