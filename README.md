@@ -13,28 +13,18 @@ o o o o o o<br>
 o o o o o o<br>
 
 There are 6 possible puzzle pieces you can get<br>
-### 1
+### id=0
+![alt text](img/pieces/0.png)
+### id=1
 ![alt text](img/pieces/1.png)
-
-2)<br>
-x x<br>
-&ensp;&ensp;x<br>
-
-3)<br>
-x x<br>
-x x<br>
-
-4)<br>
-x<br>
-x<br>
-x<br>
-
-5)<br>
-x x<br>
-&ensp;&ensp;x x<br>
-
-6)<br>
-x<br>
+### id=2
+![alt text](img/pieces/2.png)
+### id=3
+![alt text](img/pieces/3.png)
+### id=4
+![alt text](img/pieces/4.png)
+### id=5
+![alt text](img/pieces/5.png)
 
 At every turn you get one of these randomly.<br>
 You can place it on a empty position on the field or throw it away and start a new turn.<br>
