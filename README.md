@@ -12,7 +12,7 @@ The Field consists of 4 rows and 6 cols and is initialized empty<br><br>
 At each turn you can place a piece on the board or draw a random new one frome the card boxes.<br>
 ![alt text](img/card_box.png)
 
-There are 6 possible puzzle pieces you can get out of the box:<br>
+There are 6 possible puzzle pieces you can get out of the box:<br><br>
 id=0<br>
 ![alt text](img/pieces/0.png)<br>
 <br>id=1<br>
