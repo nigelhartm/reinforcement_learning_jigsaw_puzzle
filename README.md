@@ -29,11 +29,6 @@ id=0<br>
 The game is done if the field is completely filled with forms with nothing empty.<br><br>
 ![alt text](img/game_finished.png)
 
-
-## Brute force
-After setting up the basic rules for the game I created a brute force algorithm, which received following statistics on 100 runs:<br>
-Average Brute Force (Turn: 32.08 Used: 10.74 Not used: 21.34
-
 ## Rewards
 To get an idea about if this is bad or good here some information about the rewards:<br>
 10 or fewer:<br>
@@ -42,6 +37,10 @@ Large treasure chest ![alt text](img/treasure_chest.png)
 medium treasure chest ![alt text](img/treasure_chest.png)
 <br>25 or more:<br>
 small tresure chest ![alt text](img/treasure_chest.png)
+
+## Brute force
+After setting up the basic rules for the game I created a brute force algorithm, which received following statistics on 100 runs:<br>
+Average Brute Force (Turn: 32.08 Used: 10.74 Not used: 21.34)<br>
 
 ## Resources
 https://www.toptal.com/deep-learning/pytorch-reinforcement-learning-tutorial
