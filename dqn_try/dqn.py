@@ -88,8 +88,6 @@ def train(model, start):
         output = model(state)[0]
         mask = game_state.getMask().cuda()
         output = torch.mul(output, mask) # mask the output to valid moves
-        print("Masked output:")
-        print(output)
 
         # initialize action
         action_cnt+=1
@@ -119,7 +117,6 @@ def train(model, start):
         rand_action_new[0] = idx
         rand_action_new = torch.from_numpy(rand_action_new)
         rand_action_new = rand_action_new.type(torch.int)
-        print(rand_action_new)
         action_index = [rand_action_new
                         if random_action
                         else torch.argmax(output)][0]
