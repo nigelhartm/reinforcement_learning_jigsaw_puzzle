@@ -1,5 +1,6 @@
 import numpy as np
 import random
+import torch
 
 class jigsaw_game:
     board = None
@@ -23,6 +24,18 @@ class jigsaw_game:
             return True
         else:
             return False
+    
+    def getMask(self):
+        ret = np.zeros((1, 25), dtype=int)
+        for i in range(0, 24):
+            row = int(i / self.cols)
+            col = int(i % self.cols)
+            if(self.valid_move(col, row)):
+                ret[i] = 1
+            else:
+                ret[i] = 0
+        ret[24] = 1
+        return ret
 
     def move(self, x_origin, y_origin):
         try:
