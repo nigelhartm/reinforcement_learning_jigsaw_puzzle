@@ -111,7 +111,7 @@ def train(model, start):
  
         cond = mask_copy == 1
         counts = np.cumsum(cond)
-        idx = np.searchsorted(counts, rand_action)
+        idx = np.searchsorted(counts, rand_action)-1
 
         rand_action_new= np.zeros(1)
         rand_action_new[0] = idx
