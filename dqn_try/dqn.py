@@ -106,7 +106,7 @@ def train(model, start):
         #
         mask_copy = mask.cpu()
         mask_copy = mask_copy.numpy()
-        action_space = np.sum(mask_copy == 1)
+        action_space = np.sum(mask_copy == 0)
         rand_action = random.randint(1, action_space+1)
  
         cond = mask_copy == 1
