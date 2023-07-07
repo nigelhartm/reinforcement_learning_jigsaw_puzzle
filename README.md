@@ -4,6 +4,14 @@ In a computer game I liked to play as a kid there exist a minigame called Jigsaw
 ## Environment
 conda create -n jigsaw numpy pytorch -c anaconda -c pytorch<br>
 conda activate jigsaw
+maybe use
+```
+conda create --name jigsaw  python
+conda activate jigsaw
+conda install -c "nvidia/label/cuda-11.8.0" cuda-toolkit
+conda install pytorch torchvision torchaudio pytorch-cuda=11.8 -c pytorch -c nvidia
+conda install -c anaconda numpy
+```
 
 ## Rules
 The Field consists of 4 rows and 6 cols and is initialized empty<br><br>
