@@ -20,12 +20,13 @@ class jigsaw_game:
 
     def valid_move(self, x_origin, y_origin):
         board_piece_area = self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols]
-        try:
-            if(np.max(np.add(board_piece_area, self.piece.form)) == 1):
-                return True
-            else:
-                return False
-        except:
+        #check out of area
+        if(board_piece_area.shape[0] != self.piece.rows or board_piece_area.shape[1] != self.piece.cols):
+          return False
+        #check in board valid
+        if(np.max(np.add(board_piece_area, self.piece.form)) == 1):
+            return True
+        else:
             return False
     
     def getMask(self):
