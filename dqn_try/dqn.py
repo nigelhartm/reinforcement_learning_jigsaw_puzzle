@@ -19,7 +19,7 @@ class NeuralNetwork(nn.Module):
         self.gamma = 0.99
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.1
-        self.number_of_iterations = 2000000
+        self.number_of_iterations = 200000
         self.replay_memory_size = 10000
         self.minibatch_size = 128
         self.fc1 = nn.Linear(self.INPUTSIZE, 80)
@@ -194,7 +194,7 @@ def train(model, start):
 
         iter_reward += reward
         ## print overall reward every 10000 steps
-        if iteration % 10000 == 0:
+        if iteration % 1000 == 0:
             stats_file.write(str(iteration) + "\t" + str(int(iter_reward[0][0])) + "\n")
             stats_file.flush()
             iter_reward = 0
