@@ -87,7 +87,7 @@ def train(model, start):
             state = state.cuda()
         output = model(state)[0]
         mask = game_state.getMask().cuda()
-        output = torch.mul(output, mask) # mask the output to valid moves
+        output = torch.sub(output, mask) # mask the output to valid moves
 
         # initialize action
         action_cnt+=1
