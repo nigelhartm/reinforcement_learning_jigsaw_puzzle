@@ -109,7 +109,7 @@ def train(model, start):
         mask_copy = mask.cpu()
         mask_copy = mask_copy.numpy()
         action_space = np.sum(mask_copy == 1)
-        rand_action = random.randint(0, action_space)
+        rand_action = random.randint(1, action_space)
  
         cond = mask_copy == 1
         counts = np.cumsum(cond)
