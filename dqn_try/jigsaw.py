@@ -3,10 +3,10 @@ import random
 
 class jigsaw_game:
     board = None
-    rows = 2
-    cols = 2
+    rows = 4
+    cols = 6
     piece = None
-    PIECESQUARE = 2
+    PIECESQUARE = 4
 
     def __init__(self):
         self.reset()
@@ -83,53 +83,25 @@ class jigsaw_piece:
     cols = None
 
     def __init__(self):
-        piece_number = random.randint(0, 1)
+        piece_number = random.randint(0, 5)
         self.id = piece_number
         if(piece_number == 0):
-            self.form = np.array([[1, 1]], dtype=int)
+            self.form = np.array([[1, 0], [1, 1]], dtype=int)
             self.color = "green"
         elif(piece_number == 1):
-            self.form = np.array([[1], [1]], dtype=int)
+            self.form = np.array([[1, 1], [0, 1]], dtype=int)
             self.color = "yellow"
+        elif(piece_number == 2):
+            self.form = np.array([[1, 1], [1, 1]], dtype=int)
+            self.color = "brightblue"
+        elif(piece_number == 3):
+            self.form = np.array([[1], [1], [1]], dtype=int)
+            self.color = "darkblue"
+        elif(piece_number == 4):
+            self.form = np.array([[1, 1, 0], [0, 1, 1]], dtype=int)
+            self.color = "red"
+        elif(piece_number == 5):
+            self.form = np.array([[1]], dtype=int)
+            self.color = "orange"
         self.rows = self.form.shape[0]
         self.cols = self.form.shape[1]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        """
-        else:
-            piece_number = random.randint(0, 5)
-            self.id = piece_number
-            if(piece_number == 0):
-                self.form = np.array([[1, 0], [1, 1]], dtype=int)
-                self.color = "green"
-            elif(piece_number == 1):
-                self.form = np.array([[1, 1], [0, 1]], dtype=int)
-                self.color = "yellow"
-            elif(piece_number == 2):
-                self.form = np.array([[1, 1], [1, 1]], dtype=int)
-                self.color = "brightblue"
-            elif(piece_number == 3):
-                self.form = np.array([[1], [1], [1]], dtype=int)
-                self.color = "darkblue"
-            elif(piece_number == 4):
-                self.form = np.array([[1, 1, 0], [0, 1, 1]], dtype=int)
-                self.color = "red"
-            elif(piece_number == 5):
-                self.form = np.array([[1]], dtype=int)
-                self.color = "orange"
-            self.rows = self.form.shape[0]
-            self.cols = self.form.shape[1]
-        """

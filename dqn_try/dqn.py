@@ -10,8 +10,8 @@ import torch.optim as optim
 from jigsaw import jigsaw_game
 
 class NeuralNetwork(nn.Module):
-    INPUTSIZE = 2*4
-    ACTIONS = 5
+    INPUTSIZE = 4*10
+    ACTIONS = 25
 
     def __init__(self):
         super(NeuralNetwork, self).__init__()
@@ -65,15 +65,10 @@ def train(model, start):
     replay_memory = [] # initialize replay memory
 
     # initial action is get a new piece
-    """
-    action = np.array([0, 0, 0, 0, 0, 0,
+    init_action = np.array([0, 0, 0, 0, 0, 0,
                        0, 0, 0, 0, 0, 0,
                        0, 0, 0, 0, 0, 0,
                        0, 0, 0, 0, 0, 0,
-                       1])
-    """
-    init_action = np.array([0, 0,
-                       0, 0,
                        1])
     state_reward = game_state.get_state(init_action)
     state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
