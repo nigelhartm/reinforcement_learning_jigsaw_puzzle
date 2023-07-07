@@ -101,6 +101,14 @@ def train(model, start):
         random_action = random.random() <= epsilon
         if random_action:
             print("Performed random action!")
+        #action_index = [torch.randint(model.number_of_actions, torch.Size([]), dtype=torch.int)
+        #                if random_action
+        #                else torch.argmax(output)][0]
+        mask_copy = mask.cpu()
+        mask_copy = mask_copy.numpy()
+        action_space = np.sum(mask_copy == 1)
+        
+
         action_index = [torch.randint(model.number_of_actions, torch.Size([]), dtype=torch.int)
                         if random_action
                         else torch.argmax(output)][0]
@@ -119,7 +127,7 @@ def train(model, start):
 
         action = action.unsqueeze(0)
         reward = torch.from_numpy(np.array([reward], dtype=np.float32)).unsqueeze(0)
-        
+
         # save transition to replay memory
         replay_memory.append((state, action, reward, state_1, finished))
 
