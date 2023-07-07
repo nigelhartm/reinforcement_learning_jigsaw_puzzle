@@ -80,8 +80,6 @@ class jigsaw_game:
         piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols] = np.add(piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols], self.piece.form)
         state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
 
-        print(state)
-
         finish = self.solved()
         if(finish):
             self.reward = 10
