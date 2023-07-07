@@ -104,12 +104,23 @@ def train(model, start):
         #action_index = [torch.randint(model.number_of_actions, torch.Size([]), dtype=torch.int)
         #                if random_action
         #                else torch.argmax(output)][0]
+        # THIS PART IS TRICKY but basically we just try to map the random action to masked actions
+        #
         mask_copy = mask.cpu()
         mask_copy = mask_copy.numpy()
         action_space = np.sum(mask_copy == 1)
-        
+        rand_action = random.randint(0, action_space)
+ 
+        cond = mask_copy == 1
+        counts = np.cumsum(cond)
+        idx = np.searchsorted(counts, rand_action)
 
-        action_index = [torch.randint(model.number_of_actions, torch.Size([]), dtype=torch.int)
+        rand_action_new= np.zeros(1)
+        rand_action_new[0] = idx
+        rand_action_new = torch.from_numpy(rand_action_new)
+        rand_action_new = rand_action_new.type(torch.int)
+        print(rand_action_new)
+        action_index = [rand_action_new
                         if random_action
                         else torch.argmax(output)][0]
 
