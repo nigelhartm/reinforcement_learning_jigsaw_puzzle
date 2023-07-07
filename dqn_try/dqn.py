@@ -83,11 +83,14 @@ def train(model, start):
     # main infinite loop
     while iteration < model.number_of_iterations:
         state=state.unsqueeze(0)
+        if torch.cuda.is_available():  # put on GPU if CUDA is available
+            state = state.cuda()
         output = model(state)[0]
-        output = torch.mul(output, game_state.getMask()) # mask the output to valid moves
+        mask = game_state.getMask().cuda()
+        output = torch.mul(output, mask) # mask the output to valid moves
         print("Masked output:")
         print(output)
-        
+
         # initialize action
         action_cnt+=1
         action = torch.zeros([model.number_of_actions], dtype=torch.float32)
@@ -107,6 +110,8 @@ def train(model, start):
 
         action[action_index] = 1
 
+        action = action.cpu()
+
         state_reward = game_state.get_state(action)
         state_1= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
         reward = state_reward[1]
@@ -114,13 +119,10 @@ def train(model, start):
 
         action = action.unsqueeze(0)
         reward = torch.from_numpy(np.array([reward], dtype=np.float32)).unsqueeze(0)
+        
         # save transition to replay memory
         replay_memory.append((state, action, reward, state_1, finished))
-        #print("STATS::::")
-        #print(state)
-        #print(reward)
-        #print(state_1)
-        #print(finished)
+
         # if replay memory is full, remove the oldest transition
         if len(replay_memory) > model.replay_memory_size:
             replay_memory.pop(0)
