@@ -35,7 +35,7 @@ class jigsaw_game:
             else:
                 ret[i] = 0
         ret[24] = 1
-        return ret
+        return torch.from_numpy(ret)
 
     def move(self, x_origin, y_origin):
         try:
