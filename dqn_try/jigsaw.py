@@ -70,7 +70,7 @@ class jigsaw_game:
                 self.reward = 1
                 self.new_piece()
             else:
-                self.reward = -10
+                exit("ERROR action not allowed")
         else:
             if(action == self.rows * self.cols):
                 self.new_piece()
