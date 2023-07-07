@@ -84,12 +84,10 @@ def train(model, start):
     while iteration < model.number_of_iterations:
         state=state.unsqueeze(0)
         output = model(state)[0]
-        print("output:")
+        output = torch.mul(output, game_state.getMask()) # mask the output to valid moves
+        print("Masked output:")
         print(output)
-        print("mask:")
-        print(game_state.getMask())
-        print("like this")
-        print(torch.mul(output, game_state.getMask()))
+        
         # initialize action
         action_cnt+=1
         action = torch.zeros([model.number_of_actions], dtype=torch.float32)

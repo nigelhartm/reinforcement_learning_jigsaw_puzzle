@@ -42,16 +42,12 @@ class jigsaw_game:
         return torch.from_numpy(ret)
 
     def move(self, x_origin, y_origin):
-        try:
-            if(self.valid_move(x_origin, y_origin)):
-                self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols] = np.add(self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols], self.piece.form)
-                print("Piece " + str(self.piece.id) + " added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
-                return True
-            else:
-                print("Piece " + str(self.piece.id) + " not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
-                return False
-        except:
-            print("Piece " + str(self.piece.id) + " not added (Reason out of Field at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
+        if(self.valid_move(x_origin, y_origin)):
+            self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols] = np.add(self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols], self.piece.form)
+            print("Piece " + str(self.piece.id) + " added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
+            return True
+        else:
+            print("Piece " + str(self.piece.id) + " not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + " or out of field)")
             return False
     
     def new_piece(self):
@@ -83,6 +79,8 @@ class jigsaw_game:
         piece_buffer = np.zeros((self.PIECESQUARE, self.PIECESQUARE), dtype=int)
         piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols] = np.add(piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols], self.piece.form)
         state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
+
+        print(state)
 
         finish = self.solved()
         if(finish):
