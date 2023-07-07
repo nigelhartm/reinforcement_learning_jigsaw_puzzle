@@ -88,6 +88,8 @@ def train(model, start):
         print(output)
         print("mask:")
         print(game_state.getMask())
+        print("like this")
+        print(torch.mul(output, game_state))
         # initialize action
         action_cnt+=1
         action = torch.zeros([model.number_of_actions], dtype=torch.float32)
