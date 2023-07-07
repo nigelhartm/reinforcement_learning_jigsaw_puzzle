@@ -26,7 +26,7 @@ class jigsaw_game:
             return False
     
     def getMask(self):
-        ret = np.zeros((1, 25), dtype=int)
+        ret = np.zeros((25), dtype=int)
         for i in range(0, 24):
             row = int(i / self.cols)
             col = int(i % self.cols)
