@@ -19,25 +19,29 @@ class NeuralNetwork(nn.Module):
         self.gamma = 0.99
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.1
-        self.number_of_iterations = 200000
-        self.replay_memory_size = 10000
-        self.minibatch_size = 128
-        self.fc1 = nn.Linear(self.INPUTSIZE, 80)
+        self.number_of_iterations = 2000000
+        self.replay_memory_size = 20000
+        self.minibatch_size = 64
+        self.fc1 = nn.Linear(self.INPUTSIZE, 320)
         self.relu1 = nn.ReLU(inplace=True)
-        self.fc3 = nn.Linear(80, 80)
+        self.fc2 = nn.Linear(320, 640)
+        self.relu2 = nn.ReLU(inplace=True)
+        self.fc3 = nn.Linear(640, 160)
         self.relu3 = nn.ReLU(inplace=True)
-        self.fc4 = nn.Linear(80, 40)
+        self.fc4 = nn.Linear(160, 60)
         self.relu4 = nn.ReLU(inplace=True)
-        self.fc6 = nn.Linear(40, self.number_of_actions)
+        self.fc5 = nn.Linear(60, self.number_of_actions)
     def forward(self, x):
         out = x.view(x.size()[0], -1)
         out = self.fc1(out)
         out = self.relu1(out)
+        out = self.fc2(out)
+        out = self.relu2(out)
         out = self.fc3(out)
         out = self.relu3(out)
         out = self.fc4(out)
         out = self.relu4(out)
-        out = self.fc6(out)
+        out = self.fc5(out)
         return out
 
 def init_weights(m):
@@ -88,7 +92,7 @@ def train(model, start):
         output = model(state)[0]
         mask = game_state.getMask().cuda()
         output = torch.sub(output, mask) # mask the output to valid moves
-
+        print(output)
         # initialize action
         action_cnt+=1
         action = torch.zeros([model.number_of_actions], dtype=torch.float32)
@@ -108,7 +112,7 @@ def train(model, start):
         mask_copy = mask_copy.numpy()
         action_space = np.sum(mask_copy == 0)
         rand_action = random.randint(1, action_space)
- 
+        print(mask_copy)
         cond = mask_copy == 1
         counts = np.cumsum(cond)
         idx = np.searchsorted(counts, rand_action)-1
@@ -200,8 +204,6 @@ def train(model, start):
             iter_reward = 0
         if finished:
             solved_cnt=solved_cnt+1
-            print("FINISHED:")
-            print("in -> " + str(action_cnt))
             puzzlestats_file.write(str(solved_cnt) + "\t" + str(action_cnt) + "\n")
             puzzlestats_file.flush()
             action_cnt = 0

@@ -75,15 +75,15 @@ class jigsaw_game:
         else:
             if(action == self.rows * self.cols):
                 self.new_piece()
-                self.reward = -1
+                self.reward = -2
         
         piece_buffer = np.zeros((self.PIECESQUARE, self.PIECESQUARE), dtype=int)
         piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols] = np.add(piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols], self.piece.form)
         state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
-
+        print(state)
         finish = self.solved()
         if(finish):
-            self.reward = 10
+            self.reward = 50
         reward_last_action = self.reward
         if(finish):
             self.reset()
