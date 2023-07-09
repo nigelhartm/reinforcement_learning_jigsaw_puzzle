@@ -45,20 +45,20 @@ class jigsaw_game:
     def move(self, x_origin, y_origin):
         if(self.valid_move(x_origin, y_origin)):
             self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols] = np.add(self.board[y_origin:y_origin+self.piece.rows, x_origin:x_origin+self.piece.cols], self.piece.form)
-            print("Piece " + str(self.piece.id) + " added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
+            #print("Piece " + str(self.piece.id) + " added at position x="+ str(x_origin) + " y=" + str(y_origin) + ")")
             return True
         else:
-            print("Piece " + str(self.piece.id) + " not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + " or out of field)")
+            #print("Piece " + str(self.piece.id) + " not added (Reason already other piece at position x="+ str(x_origin) + " y=" + str(y_origin) + " or out of field)")
             return False
     
     def new_piece(self):
         self.piece = jigsaw_piece()
-        print("Get new piece " + str(self.piece.id))
+        #print("Get new piece " + str(self.piece.id))
     
     def reset(self):
         self.board = np.zeros((self.rows,self.cols), dtype=int)
         self.new_piece()
-        self.reward = 0
+        self.reward = 25
 
     def get_state(self, action):
         is_moved = False
@@ -68,22 +68,22 @@ class jigsaw_game:
             col = int(action % self.cols)
             is_moved = self.move(col, row)
             if is_moved:
-                self.reward = 1
+                self.reward -= 1
                 self.new_piece()
             else:
                 exit("ERROR action not allowed")
         else:
             if(action == self.rows * self.cols):
                 self.new_piece()
-                self.reward = -1
+                self.reward -= 1
         
         piece_buffer = np.zeros((self.PIECESQUARE, self.PIECESQUARE), dtype=int)
         piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols] = np.add(piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols], self.piece.form)
         state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
-        print(state)
+        #print(state)
         finish = self.solved()
-        if(finish):
-            self.reward = 10
+        #if(finish):
+        #    self.reward = 10
         reward_last_action = self.reward
         if(finish):
             self.reset()
