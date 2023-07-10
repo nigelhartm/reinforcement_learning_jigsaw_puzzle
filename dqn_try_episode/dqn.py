@@ -18,18 +18,20 @@ class NeuralNetwork(nn.Module):
         self.number_of_actions = self.ACTIONS
         self.gamma = 0.99
         self.final_epsilon = 0.0001
-        self.initial_epsilon = 0.2
-        self.number_of_iterations = 1000000
-        self.replay_memory_size = 50000
-        self.minibatch_size = 1000
-        self.fc1 = nn.Linear(self.INPUTSIZE, 1024)
+        self.initial_epsilon = 0.5
+        self.number_of_iterations = 2000000
+        self.replay_memory_size = 100000
+        self.minibatch_size = 2000
+        self.fc1 = nn.Linear(self.INPUTSIZE, 2048)
         self.relu1 = nn.ReLU(inplace=True)
-        self.fc2 = nn.Linear(1024, 1024)
+        self.fc2 = nn.Linear(2048, 2048)
         self.relu2 = nn.ReLU(inplace=True)
-        self.fc3 = nn.Linear(1024, 512)
+        self.fc3 = nn.Linear(2048, 1024)
         self.relu3 = nn.ReLU(inplace=True)
-        self.fc4 = nn.Linear(512, 256)
+        self.fc4 = nn.Linear(1024, 512)
         self.relu4 = nn.ReLU(inplace=True)
+        self.fc42 = nn.Linear(512, 256)
+        self.relu42 = nn.ReLU(inplace=True)
         self.fc5 = nn.Linear(256, self.number_of_actions)
     def forward(self, x):
         out = x.view(x.size()[0], -1)
@@ -41,6 +43,8 @@ class NeuralNetwork(nn.Module):
         out = self.relu3(out)
         out = self.fc4(out)
         out = self.relu4(out)
+        out = self.fc42(out)
+        out = self.relu42(out)
         out = self.fc5(out)
         return out
 
