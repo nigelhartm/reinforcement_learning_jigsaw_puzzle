@@ -9,12 +9,20 @@ class jigsaw_game:
     cols = 6
     piece = None
     PIECESQUARE = 4
+    step = 0
 
     def __init__(self):
         self.reset()
 
     def solved(self):
         if(np.array_equal(self.board, np.ones((self.rows, self.cols), dtype=int))):
+            if self.step <= 10:
+                self.reward = 200
+            else:
+                if self.step <= 24:
+                    self.reward = 100
+                else:
+                    self.reward = 50
             return True
         else:
             return False
@@ -58,7 +66,8 @@ class jigsaw_game:
     def reset(self):
         self.board = np.zeros((self.rows,self.cols), dtype=int)
         self.new_piece()
-        self.reward = 25
+        self.reward = -1
+        self.step=0
 
     def get_state(self, action):
         is_moved = False
@@ -68,26 +77,24 @@ class jigsaw_game:
             col = int(action % self.cols)
             is_moved = self.move(col, row)
             if is_moved:
-                self.reward -= 1
+                self.step +=  1
                 self.new_piece()
             else:
                 exit("ERROR action not allowed")
         else:
             if(action == self.rows * self.cols):
                 self.new_piece()
-                self.reward -= 1
-        
+                self.step += 1
         piece_buffer = np.zeros((self.PIECESQUARE, self.PIECESQUARE), dtype=int)
         piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols] = np.add(piece_buffer[0:0+self.piece.rows, 0:0+self.piece.cols], self.piece.form)
         state = np.concatenate((self.board, piece_buffer), axis=1, out=None, dtype=int, casting="no")
         #print(state)
         finish = self.solved()
-        #if(finish):
-        #    self.reward = 10
         reward_last_action = self.reward
+        stepp = self.step
         if(finish):
             self.reset()
-        return [state, reward_last_action, finish]
+        return [state, reward_last_action, finish, stepp]
 
 class jigsaw_piece:
     id = None

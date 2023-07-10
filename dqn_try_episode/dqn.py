@@ -18,33 +18,25 @@ class NeuralNetwork(nn.Module):
         self.number_of_actions = self.ACTIONS
         self.gamma = 0.99
         self.final_epsilon = 0.0001
-        self.initial_epsilon = 0.25
-        self.number_of_iterations = 100000
-        self.replay_memory_size = 20000
-        self.minibatch_size = 500
-        self.fc1 = nn.Linear(self.INPUTSIZE, 640)
+        self.initial_epsilon = 0.1
+        self.number_of_iterations = 1000000
+        self.replay_memory_size = 50000
+        self.minibatch_size = 1000
+        self.fc1 = nn.Linear(self.INPUTSIZE, 1024)
         self.relu1 = nn.ReLU(inplace=True)
-        self.fc2 = nn.Linear(640, 1280)
+        self.fc2 = nn.Linear(1024, 1024)
         self.relu2 = nn.ReLU(inplace=True)
-        self.fc21 = nn.Linear(1280, 1280)
-        self.relu21 = nn.ReLU(inplace=True)
-        self.fc22 = nn.Linear(1280, 640)
-        self.relu22 = nn.ReLU(inplace=True)
-        self.fc3 = nn.Linear(640, 320)
+        self.fc3 = nn.Linear(1024, 512)
         self.relu3 = nn.ReLU(inplace=True)
-        self.fc4 = nn.Linear(320, 160)
+        self.fc4 = nn.Linear(512, 256)
         self.relu4 = nn.ReLU(inplace=True)
-        self.fc5 = nn.Linear(160, self.number_of_actions)
+        self.fc5 = nn.Linear(256, self.number_of_actions)
     def forward(self, x):
         out = x.view(x.size()[0], -1)
         out = self.fc1(out)
         out = self.relu1(out)
         out = self.fc2(out)
         out = self.relu2(out)
-        out = self.fc21(out)
-        out = self.relu21(out)
-        out = self.fc22(out)
-        out = self.relu22(out)
         out = self.fc3(out)
         out = self.relu3(out)
         out = self.fc4(out)
@@ -58,13 +50,15 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 def train(model, start):
+    large = 0
+    middle = 0
+    small = 0
+    thrown_game = 0
     solved_cnt = 0
     stats_reward = 0
     stats_file = open("pretrained_model/stats.tsv", "w")
-
-    stats_file.write("1000its\tmean_rewards\n")
+    stats_file.write("its\tmean\tlarge\tmiddle\tsmall\tthrowngame(small)\n")
     stats_file.flush()
-
     optimizer = optim.Adam(model.parameters(), lr=1e-6)
     criterion = nn.MSELoss()
     replay_memory = []
@@ -81,8 +75,9 @@ def train(model, start):
         state_reward = game_state.get_state(init_action)
         reward = state_reward[1]
         state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
+        step = state_reward[3]
         finished = state_reward[2]
-        while finished == False and reward > -1:
+        while finished == False and step <= 30:
             state=state.unsqueeze(0)
             if torch.cuda.is_available():
                 state = state.cuda()
@@ -94,8 +89,6 @@ def train(model, start):
             if torch.cuda.is_available():
                 action = action.cuda()
             random_action = random.random() <= epsilon
-            #if random_action:
-                #print("Performed random action!")
             mask_copy = mask.cpu()
             mask_copy = mask_copy.numpy()
             action_space = np.sum(mask_copy == 0)
@@ -118,20 +111,18 @@ def train(model, start):
             state_1 = torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
             reward = state_reward[1]
             finished = state_reward[2]
+            step = state_reward[3]
             action = action.unsqueeze(0)
             reward = torch.from_numpy(np.array([reward], dtype=np.float32)).unsqueeze(0)
             end_reward = reward
             list_state.append(state)
             list_action.append(action)
             list_state1.append(state_1)
-
             state = state_1
         for i in range(0, len(list_state)):
             replay_memory.append((list_state[i], list_action[i], end_reward, list_state1[i], finished))
-        # if replay memory is full, remove the oldest transitions
         while len(replay_memory) > model.replay_memory_size:
             replay_memory.pop(0)
-
         epsilon = epsilon_decrements[iteration]
         minibatch = random.sample(replay_memory, min(len(replay_memory), model.minibatch_size))
         state_batch = torch.cat(tuple(d[0] for d in minibatch))
@@ -144,28 +135,39 @@ def train(model, start):
             reward_batch = reward_batch.cuda()
             state_1_batch = state_1_batch.cuda()
         state_1_batch = state_1_batch.unsqueeze(1)
+        
         output_1_batch = model(state_1_batch)
-        y_batch = torch.cat(tuple(reward_batch[i] if minibatch[i][4]
-                                  else reward_batch[i] + model.gamma * torch.max(output_1_batch[i])
+        y_batch = torch.cat(tuple(reward_batch[i]# if minibatch[i][4]
+                                  #else reward_batch[i] + model.gamma * torch.max(output_1_batch[i])
                                   for i in range(len(minibatch))))
         q_value = torch.sum(model(state_batch) * action_batch, dim=1)
         optimizer.zero_grad()
         y_batch = y_batch.detach()
         loss = criterion(q_value, y_batch)
         loss.backward()
-        #print("loss:" + str(loss))
         optimizer.step()
         state = state_1
         iteration += 1
         if iteration % 25000 == 0:
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
-        if(end_reward <= 0):
-            stats_reward += 0
+        stats_reward += int(end_reward)
+        if step <= 10:
+            large += 1
         else:
-            stats_reward += int(end_reward)
+            if step <= 24:
+                middle += 1
+            else:
+                if step <= 30:
+                    small += 1
+                else:
+                    thrown_game += 1
         if iteration % 1000 == 0:
-            stats_file.write(str(iteration) + "\t" + str(float(stats_reward/1000)) + "\n")
+            stats_file.write(str(iteration) + "\t" + str(float(stats_reward/1000)) + "\t" + str(large) + "\t" + str(middle) + "\t" + str(small) + "\t" + str(thrown_game) + "\n")
             stats_file.flush()
+            large = 0
+            middle = 0
+            small = 0
+            thrown_game = 0
             stats_reward = 0
         if finished:
             solved_cnt += 1
