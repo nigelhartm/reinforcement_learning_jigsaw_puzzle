@@ -18,7 +18,7 @@ class NeuralNetwork(nn.Module):
         self.number_of_actions = self.ACTIONS
         self.gamma = 0.99
         self.final_epsilon = 0.0001
-        self.initial_epsilon = 0.1
+        self.initial_epsilon = 0.2
         self.number_of_iterations = 1000000
         self.replay_memory_size = 50000
         self.minibatch_size = 1000
