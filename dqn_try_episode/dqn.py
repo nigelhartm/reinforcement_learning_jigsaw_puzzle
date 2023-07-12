@@ -18,10 +18,10 @@ class NeuralNetwork(nn.Module):
         self.number_of_actions = self.ACTIONS
         self.gamma = 0.99
         self.final_epsilon = 0.0001
-        self.initial_epsilon = 0.4
-        self.number_of_iterations = 1000000
+        self.initial_epsilon = 0.5
+        self.number_of_iterations = 2000000
         self.replay_memory_size = 1000000
-        self.minibatch_size = 3000
+        self.minibatch_size = 2000
         self.fc1 = nn.Linear(self.INPUTSIZE, 2048)
         self.relu1 = nn.ReLU(inplace=True)
         self.fc2 = nn.Linear(2048, 4096)
@@ -127,8 +127,10 @@ def train(model, start):
             list_action.append(action)
             list_state1.append(state_1)
             state = state_1
-        for i in range(0, len(list_state)):
-            replay_memory.append((list_state[i], list_action[i], end_reward, list_state1[i], finished))
+        if end_reward != 0 or (end_reward == 0 and random.random() < 0.1) or iteration == 0:
+            print("used")
+            for i in range(0, len(list_state)):
+                replay_memory.append((list_state[i], list_action[i], end_reward, list_state1[i], finished))
         while len(replay_memory) > model.replay_memory_size:
             replay_memory.pop(0)
         epsilon = epsilon_decrements[iteration]
