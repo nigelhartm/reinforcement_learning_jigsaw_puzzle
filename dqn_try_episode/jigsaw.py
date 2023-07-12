@@ -17,12 +17,12 @@ class jigsaw_game:
     def solved(self):
         if(np.array_equal(self.board, np.ones((self.rows, self.cols), dtype=int))):
             if self.step <= 10:
-                self.reward = 200
+                self.reward = 10
             else:
                 if self.step <= 24:
-                    self.reward = 100
+                    self.reward = 5
                 else:
-                    self.reward = 50
+                    self.reward = 1
             return True
         else:
             return False
@@ -66,7 +66,7 @@ class jigsaw_game:
     def reset(self):
         self.board = np.zeros((self.rows,self.cols), dtype=int)
         self.new_piece()
-        self.reward = -1
+        self.reward = 0
         self.step=0
 
     def get_state(self, action):
