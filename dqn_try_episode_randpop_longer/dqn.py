@@ -18,10 +18,10 @@ class NeuralNetwork(nn.Module):
         self.number_of_actions = self.ACTIONS
         self.gamma = 0.99
         self.final_epsilon = 0.0001
-        self.initial_epsilon = 0.5
-        self.number_of_iterations = 2000000
-        self.replay_memory_size = 1000000
-        self.minibatch_size = 2000
+        self.initial_epsilon = 0.50
+        self.number_of_iterations = 3000000
+        self.replay_memory_size = 6000000
+        self.minibatch_size = 3000
         self.fc1 = nn.Linear(self.INPUTSIZE, 2048)
         self.relu1 = nn.ReLU(inplace=True)
         self.fc2 = nn.Linear(2048, 4096)
@@ -30,9 +30,9 @@ class NeuralNetwork(nn.Module):
         self.relu3 = nn.ReLU(inplace=True)
         self.fc4 = nn.Linear(2048, 1024)
         self.relu4 = nn.ReLU(inplace=True)
-        self.fc42 = nn.Linear(1024, 512)
+        self.fc42 = nn.Linear(1024, 1024)
         self.relu42 = nn.ReLU(inplace=True)
-        self.fc44 = nn.Linear(512, 512)
+        self.fc44 = nn.Linear(1024, 512)
         self.relu44 = nn.ReLU(inplace=True)
         self.fc5 = nn.Linear(512, self.number_of_actions)
     def forward(self, x):
@@ -58,6 +58,7 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 def train(model, start):
+    global_steps = 0
     large = 0
     middle = 0
     small = 0
@@ -65,7 +66,7 @@ def train(model, start):
     solved_cnt = 0
     stats_reward = 0
     stats_file = open("pretrained_model/stats.tsv", "w")
-    stats_file.write("its\tmean\tlarge\tmiddle\tsmall\tthrowngame(small)\n")
+    stats_file.write("its\tmean\tlarge\tmiddle\tsmall\tstopped\ttiles\n")
     stats_file.flush()
     optimizer = optim.Adam(model.parameters(), lr=1e-6)
     criterion = nn.MSELoss()
@@ -127,12 +128,14 @@ def train(model, start):
             list_action.append(action)
             list_state1.append(state_1)
             state = state_1
-        if end_reward != -1 or (end_reward == -1 and random.random() < 0.02) or iteration == 0:
+        global_steps += step
+        if end_reward != -1 or (end_reward == -1 and random.random() < 0.005) or iteration == 0:
             print("used")
             for i in range(0, len(list_state)):
                 replay_memory.append((list_state[i], list_action[i], end_reward, list_state1[i], finished))
         while len(replay_memory) > model.replay_memory_size:
-            replay_memory.pop(0)
+            x = random.randint(0, len(replay_memory)-1)
+            replay_memory.pop(x)
         epsilon = epsilon_decrements[iteration]
         minibatch = random.sample(replay_memory, min(len(replay_memory), model.minibatch_size))
         state_batch = torch.cat(tuple(d[0] for d in minibatch))
@@ -145,7 +148,6 @@ def train(model, start):
             reward_batch = reward_batch.cuda()
             state_1_batch = state_1_batch.cuda()
         state_1_batch = state_1_batch.unsqueeze(1)
-        
         output_1_batch = model(state_1_batch)
         y_batch = torch.cat(tuple(reward_batch[i]# if minibatch[i][4]
                                   #else reward_batch[i] + model.gamma * torch.max(output_1_batch[i])
@@ -158,7 +160,7 @@ def train(model, start):
         optimizer.step()
         state = state_1
         iteration += 1
-        if iteration % 25000 == 0:
+        if iteration % 100000 == 0:
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
         stats_reward += int(end_reward)
         if step <= 10:
@@ -171,14 +173,15 @@ def train(model, start):
                     small += 1
                 else:
                     thrown_game += 1
-        if iteration % 1000 == 0:
-            stats_file.write(str(iteration) + "\t" + str(float(stats_reward/1000)) + "\t" + str(large) + "\t" + str(middle) + "\t" + str(small) + "\t" + str(thrown_game) + "\n")
+        if iteration % 10000 == 0:
+            stats_file.write(str(iteration) + "\t" + str(float(stats_reward/1000)) + "\t" + str(large) + "\t" + str(middle) + "\t" + str(small) + "\t" + str(thrown_game) + "\t" + str(global_steps) + "\n")
             stats_file.flush()
             large = 0
             middle = 0
             small = 0
             thrown_game = 0
             stats_reward = 0
+            global_steps = 0
         if finished:
             solved_cnt += 1
         print("iteration:", iteration, "\telapsed time:", time.time()-start, "\tepsilon:", epsilon, "\taction:",

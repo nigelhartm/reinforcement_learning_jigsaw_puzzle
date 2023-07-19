@@ -17,7 +17,7 @@ class jigsaw_game:
     def solved(self):
         if(np.array_equal(self.board, np.ones((self.rows, self.cols), dtype=int))):
             if self.step <= 10:
-                self.reward = 50
+                self.reward = 100
             else:
                 if self.step <= 24:
                     self.reward = 25
