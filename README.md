@@ -52,6 +52,15 @@ R = Round number (=solved puzzles)<br>
 T = Tiles used overall<br>
 O = Average Tiles per round<br>
 
+## Non-episodic approach
+This was the basic approch I tried based on the flappy bird example. This was not really nice performing.
+
+## Episodic approach
+Using a episodic approach looks more promising and makes more sense, cause the reward if a decision was good is based on the outcome of every episode. With big amount of replay_memory this looks quite promising. Actually this one needs way to much time for training (days) and is even then not that good performing than expected.
+
+## ToDo
+* Parrallelized running (faster training)
+* play maybe 100 games manual to have something to compare my results too, maybe I just have to high expecatation and the model is already better/similar than human
 
 ## Resources
 https://www.toptal.com/deep-learning/pytorch-reinforcement-learning-tutorial
