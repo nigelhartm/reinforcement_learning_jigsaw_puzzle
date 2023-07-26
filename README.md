@@ -49,7 +49,8 @@ small tresure chest ![alt text](img/treasure_chest.png)
 ## Brute force
 After setting up the basic rules for the game I created a brute force algorithm, which received following statistics on 100 runs:<br>
 Average Brute Force (Turn: 32.08 Used: 10.74 Not used: 21.34)<br>
-
+![alt text](img/animation_small.gif)<br><br>
+![alt text](img/animation_big.gif)<br>
 ## Resources
 https://www.toptal.com/deep-learning/pytorch-reinforcement-learning-tutorial
 https://pub.towardsai.net/understanding-tensor-dimensions-in-deep-learning-models-with-pytorch-4ee828693826
