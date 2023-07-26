@@ -21,18 +21,13 @@ At each turn you can place a piece on the board or draw a random new one frome t
 ![alt text](img/card_box.png)
 
 There are 6 possible puzzle pieces you can get out of the box:<br><br>
-id=0<br>
-![alt text](img/pieces/0.png)<br>
-<br>id=1<br>
-![alt text](img/pieces/1.png)<br>
-<br>id=2<br>
-![alt text](img/pieces/2.png)<br>
-<br>id=3<br>
-![alt text](img/pieces/3.png)<br>
-<br>id=4<br>
-![alt text](img/pieces/4.png)<br>
-<br>id=5<br>
-![alt text](img/pieces/5.png)<br>
+
+![alt text](img/pieces/0.png)
+![alt text](img/pieces/1.png)
+![alt text](img/pieces/2.png)
+![alt text](img/pieces/3.png)
+![alt text](img/pieces/4.png)
+![alt text](img/pieces/5.png)
 
 The game is done if the field is completely filled with forms with nothing empty.<br><br>
 ![alt text](img/game_finished.png)
