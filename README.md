@@ -62,6 +62,9 @@ Using a episodic approach looks more promising and makes more sense, cause the r
 * Parrallelized running (faster training)
 * play maybe 100 games manual to have something to compare my results too, maybe I just have to high expecatation and the model is already better/similar than human
 
+## Idea
+we could create a openapi of the finished model. It would have low traffic (entire state can be transferred as a single integer value 4 byte) it will be encoded in the binary form ... field =6*4=24 bit 1 byte left for more ..  6 puzzle piece =3bit ... 5 left .. maybe for flags reserved?
+
 ## Resources
 https://www.toptal.com/deep-learning/pytorch-reinforcement-learning-tutorial
 https://pub.towardsai.net/understanding-tensor-dimensions-in-deep-learning-models-with-pytorch-4ee828693826
