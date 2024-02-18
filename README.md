@@ -61,8 +61,9 @@ This was the basic approch I tried based on the flappy bird example. This was no
 Using a episodic approach looks more promising and makes more sense, cause the reward if a decision was good is based on the outcome of every episode. With big amount of replay_memory this looks quite promising. Actually this one needs way to much time for training (days) and is even then not that good performing than expected.
 
 ## ToDo
-* Parrallelized running (faster training)
+* Parrallelized running (faster training) -> decouple playing the game from training ... training process can fully use GPU while the playing works on multiple CPU threads and just adds to the GPU list
 * play maybe 100 games manual to have something to compare my results too, maybe I just have to high expecatation and the model is already better/similar than human
+* 
 
 ## Idea
 we could create a openapi of the finished model. It would have low traffic (entire state can be transferred as a single integer value 4 byte) it will be encoded in the binary form ... field =6*4=24 bit 1 byte left for more ..  6 puzzle piece =3bit ... 5 left .. maybe for flags reserved?
