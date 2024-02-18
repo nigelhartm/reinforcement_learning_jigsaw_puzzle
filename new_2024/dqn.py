@@ -70,7 +70,7 @@ def train(model, start):
     epsilon_decrements = np.linspace(model.initial_epsilon, model.final_epsilon, model.number_of_iterations)
 
     # Iterate training
-    while iteration < model.number_of_iterations:
+    while iteration <= model.number_of_iterations:
         iter_start_time = time.time()
         list_state = []
         list_action = []
@@ -163,7 +163,7 @@ def train(model, start):
         stats_reward += int(end_reward)
 
         # Save every 10000 iterations
-        if iteration % 10000 == 0:
+        if iteration % 100000 == 0:
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
         if finished and end_reward>0:
             solved_cnt += 1
