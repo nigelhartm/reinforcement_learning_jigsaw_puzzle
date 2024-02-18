@@ -21,7 +21,7 @@ class NeuralNetwork(nn.Module):
         self.gamma = 0.99
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.50
-        self.number_of_iterations = 2000000
+        self.number_of_iterations = 1000000
         self.replay_memory_size = 1000000
         self.minibatch_size = 5000
         self.fc1 = nn.Linear(self.INPUTSIZE, 2048)
@@ -59,6 +59,7 @@ def train(model, start):
     # Statistics
     solved_cnt = 0
     stats_reward = 0
+    global_reward = 0
 
     # Setup Learning
     optimizer = optim.Adam(model.parameters(), lr=1e-6)
@@ -166,7 +167,8 @@ def train(model, start):
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
         if finished and end_reward>0:
             solved_cnt += 1
-        wandb.log({"iteration": iteration, "epsilon": epsilon, "reward": reward.numpy()[0][0], "qmax": np.max(output.cpu().detach().numpy()), "solved": solved_cnt, "solved_per_iteration": solved_cnt/iteration, "reward_per_iteration": reward/iteration, "time_for_iteration": time.time()-iter_start_time})
+        global_reward += reward
+        wandb.log({"iteration": iteration, "epsilon": epsilon, "reward": reward.numpy()[0][0], "qmax": np.max(output.cpu().detach().numpy()), "solved": solved_cnt, "solved_per_iteration": solved_cnt/iteration, "reward_per_iteration": global_reward/iteration, "time_for_iteration": time.time()-iter_start_time})
 
 # Main function
 def main():
