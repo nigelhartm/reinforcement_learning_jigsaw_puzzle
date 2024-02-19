@@ -230,7 +230,7 @@ def test(model):
         """
 
 # Main function
-def main():
+def main(mode):
     if mode == 'train':
         # start a new wandb run to track this script
         wandb.init(
