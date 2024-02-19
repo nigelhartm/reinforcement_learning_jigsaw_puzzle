@@ -21,13 +21,13 @@ class NeuralNetwork(nn.Module):
         self.gamma = 0.99
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.50
-        self.number_of_iterations = 1000000
+        self.number_of_iterations = 200000
         self.replay_memory_size = 1000000
         self.minibatch_size = 5000
         self.fc1 = nn.Linear(self.INPUTSIZE, 2048)
         self.relu1 = nn.ReLU(inplace=True)
-        self.fc2 = nn.Linear(2048, 2048)
-        self.relu2 = nn.ReLU(inplace=True)
+        #self.fc2 = nn.Linear(2048, 2048)
+        #self.relu2 = nn.ReLU(inplace=True)
         self.fc4 = nn.Linear(2048, 1024)
         self.relu4 = nn.ReLU(inplace=True)
         self.fc42 = nn.Linear(1024, 1024)
@@ -39,8 +39,8 @@ class NeuralNetwork(nn.Module):
         out = x.view(x.size()[0], -1)
         out = self.fc1(out)
         out = self.relu1(out)
-        out = self.fc2(out)
-        out = self.relu2(out)
+        #out = self.fc2(out)
+        #out = self.relu2(out)
         out = self.fc4(out)
         out = self.relu4(out)
         out = self.fc42(out)
