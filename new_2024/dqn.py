@@ -173,10 +173,9 @@ def train(model):
 
 def test(model):
     iteration = 0
-    # Iterate training
+    # Iterate test
     while iteration <= 1:
         # Init Game
-        end_reward = 0
         game_state = jigsaw_game()
         init_action = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
         state_reward = game_state.get_state(init_action)
@@ -184,35 +183,15 @@ def test(model):
         state= torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
         step = state_reward[3]
         finished = state_reward[2]
-        """
+        
         # Play until solved or to much steps
         while finished == False:
-            state=state.unsqueeze(0)
-            if torch.cuda.is_available():
-                state = state.cuda()
+            state=state.unsqueeze(0).cuda()
             output = model(state)[0]
             mask = game_state.getMask().cuda()
             output = torch.sub(output, mask)
-            action = torch.zeros([model.number_of_actions], dtype=torch.float32)
-            if torch.cuda.is_available():
-                action = action.cuda()
-            random_action = random.random() <= epsilon
-            mask_copy = mask.cpu()
-            mask_copy = mask_copy.numpy()
-            action_space = np.sum(mask_copy == 0)
-            rand_action = random.randint(1, action_space)
-            cond = mask_copy == 1
-            counts = np.cumsum(cond)
-            idx = np.searchsorted(counts, rand_action)-1
-            rand_action_new= np.zeros(1)
-            rand_action_new[0] = idx
-            rand_action_new = torch.from_numpy(rand_action_new)
-            rand_action_new = rand_action_new.type(torch.int)
-            action_index = [rand_action_new
-                            if random_action
-                            else torch.argmax(output)][0]
-            if torch.cuda.is_available():
-                action_index = action_index.cuda()
+            action = torch.zeros([model.number_of_actions], dtype=torch.float32).cuda()
+            action_index = torch.argmax(output).cuda()
             action[action_index] = 1
             action = action.cpu()
             state_reward = game_state.get_state(action)
@@ -220,14 +199,7 @@ def test(model):
             reward = state_reward[1]
             finished = state_reward[2]
             step = state_reward[3]
-            action = action.unsqueeze(0)
-            reward = torch.from_numpy(np.array([reward], dtype=np.float32)).unsqueeze(0)
-            end_reward = reward
-            list_state.append(state)
-            list_action.append(action)
-            list_state1.append(state_1)
-            state = state_1
-        """
+        print("Round\t" + str(iteration) + "\tReward\t" + str(reward)+ "\tSteps\t" + str(step))
 
 # Main function
 def main(mode):
