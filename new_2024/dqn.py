@@ -173,8 +173,12 @@ def train(model):
 
 def test(model):
     iteration = 0
+    l = 0
+    m = 0
+    s = 0
+    s_bad = 0
     # Iterate test
-    while iteration <= 1:
+    while iteration < 100:
         # Init Game
         game_state = jigsaw_game()
         init_action = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
@@ -200,6 +204,20 @@ def test(model):
             finished = state_reward[2]
             step = state_reward[3]
         print("Round\t" + str(iteration) + "\tReward\t" + str(reward)+ "\tSteps\t" + str(step))
+        if reward == 10:
+            l += 1
+        elif reward == 5:
+            m += 1
+        elif reward == 2:
+            s += 1
+        else:
+            s_bad +=1
+        iteration += 1
+    print("\nOVERALL:")
+    print("L: " + str(l))
+    print("M: " + str(m))
+    print("S: " + str(s))
+    print("S_bad: " + str(s_bad))
 
 # Main function
 def main(mode):
