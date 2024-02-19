@@ -195,7 +195,7 @@ def test(model):
             action[action_index] = 1
             action = action.cpu()
             state_reward = game_state.get_state(action)
-            state_1 = torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
+            state = torch.from_numpy(state_reward[0].astype(np.float32)).unsqueeze(0)
             reward = state_reward[1]
             finished = state_reward[2]
             step = state_reward[3]
