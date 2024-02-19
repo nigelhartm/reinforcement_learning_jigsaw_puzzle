@@ -24,16 +24,16 @@ class jigsaw_game:
     def solved(self):
         if(np.array_equal(self.board, np.ones((self.rows, self.cols), dtype=int))):
             if self.step <= 10:
-                self.reward = 100
+                self.reward = 10
             else:
                 if self.step <= 24:
-                    self.reward = 10
+                    self.reward = 1
                 else:
-                    self.reward = -10
+                    self.reward = -1
             return True
         else:
             if self.step >= 30:
-                self.reward = -50
+                self.reward = -10
                 return True
             return False
 
