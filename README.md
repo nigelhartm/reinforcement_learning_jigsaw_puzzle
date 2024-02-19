@@ -54,6 +54,16 @@ R = Round number (=solved puzzles)<br>
 T = Tiles used overall<br>
 O = Average Tiles per round<br>
 
+## New2024
+The new model reached the following result<br>
+L: 2<br>
+M: 71<br>
+S: 13<br>
+S_bad: 14<br>
+Next versions should reward more for large chests and penalize longer runs (+25 steps), ... idea penalty increases with each step
+
+
+
 ## Non-episodic approach
 This was the basic approch I tried based on the flappy bird example. This was not really nice performing.
 
