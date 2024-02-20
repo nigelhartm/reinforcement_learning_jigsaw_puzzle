@@ -20,15 +20,15 @@ class NeuralNetwork(nn.Module):
         self.number_of_actions = self.ACTIONS
         self.gamma = 0.99
         self.final_epsilon = 0.0001
-        self.initial_epsilon = 0.50
-        self.number_of_iterations = 1000000
-        self.replay_memory_size = 1000000
-        self.minibatch_size = 5000
-        self.fc1 = nn.Linear(self.INPUTSIZE, 2048)
+        self.initial_epsilon = 0.60
+        self.number_of_iterations = 2000000
+        self.replay_memory_size = 2000000
+        self.minibatch_size = 2000
+        self.fc1 = nn.Linear(self.INPUTSIZE, 1024)
         self.relu1 = nn.ReLU(inplace=True)
         #self.fc2 = nn.Linear(2048, 2048)
         #self.relu2 = nn.ReLU(inplace=True)
-        self.fc4 = nn.Linear(2048, 1024)
+        self.fc4 = nn.Linear(1024, 1024)
         self.relu4 = nn.ReLU(inplace=True)
         self.fc42 = nn.Linear(1024, 1024)
         self.relu42 = nn.ReLU(inplace=True)
@@ -70,7 +70,7 @@ def train(model):
     epsilon_decrements = np.linspace(model.initial_epsilon, model.final_epsilon, model.number_of_iterations)
 
     # Iterate training
-    while iteration <= model.number_of_iterations:
+    while iteration < model.number_of_iterations: # iteration += 1 before saving so that last one get saved as well
         iter_start_time = time.time()
         list_state = []
         list_action = []
