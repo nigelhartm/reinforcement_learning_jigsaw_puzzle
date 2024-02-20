@@ -21,8 +21,8 @@ class NeuralNetwork(nn.Module):
         self.gamma = 0.99
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.60
-        self.number_of_iterations = 2000000
-        self.replay_memory_size = 2000000
+        self.number_of_iterations = 1500000
+        self.replay_memory_size = 1000000
         self.minibatch_size = 2000
         self.fc1 = nn.Linear(self.INPUTSIZE, 1024)
         self.relu1 = nn.ReLU(inplace=True)
