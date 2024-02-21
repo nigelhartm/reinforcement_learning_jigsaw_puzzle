@@ -165,7 +165,7 @@ def train(model):
         # Save every 100000 iterations
         if iteration % 1000000 == 0:
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
-        if finished and end_reward>=-1:
+        if finished and end_reward>0:
             solved_cnt += 1
         global_reward += reward
         wandb.log({"iteration": iteration, "epsilon": epsilon, "reward": reward.numpy()[0][0], "qmax": np.max(output.cpu().detach().numpy()), "solved": solved_cnt, "solved_per_iteration": solved_cnt/iteration, "reward_per_iteration": global_reward/iteration, "time_for_iteration": time.time()-iter_start_time})
