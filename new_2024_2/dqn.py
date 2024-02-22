@@ -22,8 +22,8 @@ class NeuralNetwork(nn.Module):
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.5
         self.number_of_iterations = 3000000 # saved jetzt auch nur jede 500k eine version
-        self.replay_memory_size = 2000000
-        self.minibatch_size = 2000
+        self.replay_memory_size = 6000000 # 6mil divided by 30 steps = 200k last games saved
+        self.minibatch_size = 3000
         self.fc1 = nn.Linear(self.INPUTSIZE, 1024)
         self.relu1 = nn.ReLU(inplace=True)
         #self.fc2 = nn.Linear(2048, 2048)
