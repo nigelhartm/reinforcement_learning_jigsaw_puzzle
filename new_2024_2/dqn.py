@@ -20,8 +20,8 @@ class NeuralNetwork(nn.Module):
         self.number_of_actions = self.ACTIONS
         self.gamma = 0.99
         self.final_epsilon = 0.0001
-        self.initial_epsilon = 0.75
-        self.number_of_iterations = 4000000 # saved jetzt auch nur jede million eine version
+        self.initial_epsilon = 0.5
+        self.number_of_iterations = 3000000 # saved jetzt auch nur jede 500k eine version
         self.replay_memory_size = 2000000
         self.minibatch_size = 2000
         self.fc1 = nn.Linear(self.INPUTSIZE, 1024)
@@ -163,7 +163,7 @@ def train(model):
         stats_reward += int(end_reward)
 
         # Save every 100000 iterations
-        if iteration % 1000000 == 0:
+        if iteration % 500000 == 0:
             torch.save(model, "pretrained_model/current_model_" + str(iteration) + ".pth")
         if finished and end_reward>0:
             solved_cnt += 1
