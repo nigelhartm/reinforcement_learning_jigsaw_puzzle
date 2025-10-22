@@ -56,6 +56,8 @@ def init_weights(m):
         m.bias.data.fill_(0.01)
 
 def train(model):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
     # Statistics
     solved_cnt = 0
     stats_reward = 0
@@ -72,9 +74,6 @@ def train(model):
     # Iterate training
     while iteration < model.number_of_iterations: # iteration += 1 before saving so that last one get saved as well
         iter_start_time = time.time()
-        list_state = []
-        list_action = []
-        list_state1 = []
 
         # Init Game
         end_reward = 0
@@ -88,15 +87,11 @@ def train(model):
 
         # Play until solved or to much steps
         while finished == False:
-            state=state.unsqueeze(0)
-            if torch.cuda.is_available():
-                state = state.cuda()
+            state=state.unsqueeze(0).to(device)
             output = model(state)[0]
-            mask = game_state.getMask().cuda()
+            mask = game_state.getMask().to(device)
             output = torch.sub(output, mask)
-            action = torch.zeros([model.number_of_actions], dtype=torch.float32)
-            if torch.cuda.is_available():
-                action = action.cuda()
+            action = torch.zeros([model.number_of_actions], dtype=torch.float32).to(device)
             random_action = random.random() <= epsilon
             mask_copy = mask.cpu()
             mask_copy = mask_copy.numpy()
@@ -112,8 +107,6 @@ def train(model):
             action_index = [rand_action_new
                             if random_action
                             else torch.argmax(output)][0]
-            if torch.cuda.is_available():
-                action_index = action_index.cuda()
             action[action_index] = 1
             action = action.cpu()
             state_reward = game_state.get_state(action)
@@ -123,34 +116,23 @@ def train(model):
             step = state_reward[3]
             action = action.unsqueeze(0)
             reward = torch.from_numpy(np.array([reward], dtype=np.float32)).unsqueeze(0)
-            end_reward = reward
-            list_state.append(state)
-            list_action.append(action)
-            list_state1.append(state_1)
+            replay_memory.append((state, action, reward, state_1, finished))
+            if len(replay_memory) > model.replay_memory_size:
+                replay_memory.pop(0)
             state = state_1
-        
-        for i in range(0, len(list_state)):
-            replay_memory.append((list_state[i], list_action[i], end_reward, list_state1[i], finished))
-        while len(replay_memory) > model.replay_memory_size:
-            x = random.randint(0, len(replay_memory)-1)
-            replay_memory.pop(x)
         # sample
         epsilon = epsilon_decrements[iteration]
         minibatch = random.sample(replay_memory, min(len(replay_memory), model.minibatch_size))
-        state_batch = torch.cat(tuple(d[0] for d in minibatch))
-        action_batch = torch.cat(tuple(d[1] for d in minibatch))
-        reward_batch = torch.cat(tuple(d[2] for d in minibatch))
-        state_1_batch = torch.cat(tuple(d[3] for d in minibatch))
+        state_batch = torch.cat(tuple(d[0] for d in minibatch)).to(device)
+        action_batch = torch.cat(tuple(d[1] for d in minibatch)).to(device)
+        reward_batch = torch.cat(tuple(d[2] for d in minibatch)).to(device)
+        state_1_batch = torch.cat(tuple(d[3] for d in minibatch)).to(device)
 
         # just update them?
-        if torch.cuda.is_available():
-            state_batch = state_batch.cuda()
-            action_batch = action_batch.cuda()
-            reward_batch = reward_batch.cuda()
-            state_1_batch = state_1_batch.cuda()
         state_1_batch = state_1_batch.unsqueeze(1)
         output_1_batch = model(state_1_batch)
-        y_batch = torch.cat(tuple(reward_batch[i]
+        y_batch = torch.cat(tuple(reward_batch[i] if minibatch[i][4]
+                                  else reward_batch[i] + model.gamma * torch.max(output_1_batch[i])
                                   for i in range(len(minibatch))))
         q_value = torch.sum(model(state_batch) * action_batch, dim=1)
         optimizer.zero_grad()
@@ -172,11 +154,15 @@ def train(model):
     torch.save(model, "pretrained_model/current_model_final.pth")
 
 def test(model):
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
     iteration = 0
     l = 0
     m = 0
     s = 0
     s_bad = 0
+    rewards = []
+    steps = []
     # Iterate test
     while iteration < 100:
         # Init Game
@@ -190,12 +176,12 @@ def test(model):
         
         # Play until solved or to much steps
         while finished == False:
-            state=state.unsqueeze(0).cuda()
+            state=state.unsqueeze(0).to(device)
             output = model(state)[0]
-            mask = game_state.getMask().cuda()
+            mask = game_state.getMask().to(device)
             output = torch.sub(output, mask)
-            action = torch.zeros([model.number_of_actions], dtype=torch.float32).cuda()
-            action_index = torch.argmax(output).cuda()
+            action = torch.zeros([model.number_of_actions], dtype=torch.float32).to(device)
+            action_index = torch.argmax(output)
             action[action_index] = 1
             action = action.cpu()
             state_reward = game_state.get_state(action)
@@ -204,6 +190,8 @@ def test(model):
             finished = state_reward[2]
             step = state_reward[3]
         print("Round\t" + str(iteration) + "\tReward\t" + str(reward)+ "\tSteps\t" + str(step))
+        rewards.append(reward)
+        steps.append(step)
         if reward == 10:
             l += 1
         elif reward == 5:
@@ -213,11 +201,16 @@ def test(model):
         else:
             s_bad +=1
         iteration += 1
+
     print("\nOVERALL:")
     print("L: " + str(l))
     print("M: " + str(m))
     print("S: " + str(s))
     print("S_bad: " + str(s_bad))
+
+    # In the test function, after the while loop, add the following to print a summary of the test results
+    print(f"    Average reward: {np.mean(rewards)}")
+    print(f"    Average steps: {np.mean(steps)}")
 
 # Main function
 def main(mode):
@@ -232,20 +225,12 @@ def main(mode):
         if not os.path.exists('pretrained_model/'):
             os.mkdir('pretrained_model/')
         model = NeuralNetwork()
-        if torch.cuda.is_available():
-            model = model.cuda()
-        else:
-            sys.exit("No cuda gpu available.")
         model.apply(init_weights)
         train(model)
         wandb.finish()
     elif mode == 'test':
         # Model class must be defined somewhere before
-        model = torch.load("pretrained_model/current_model_final.pth")
-        if torch.cuda.is_available():
-            model = model.cuda()
-        else:
-            sys.exit("No cuda gpu available.")
+        model = torch.load("pretrained_model/current_model_final.pth", weights_only=False)
         model.eval()
         test(model)
     else:

@@ -24,16 +24,16 @@ class jigsaw_game:
     def solved(self):
         if(np.array_equal(self.board, np.ones((self.rows, self.cols), dtype=int))):
             if self.step <= 10:
-                self.reward = 100
+                self.reward += 100
             else:
                 if self.step <= 24:
-                    self.reward = 25
+                    self.reward += 25
                 else:
-                    self.reward = 5
+                    self.reward += 5
             return True
         else:
             if self.step >= 30:
-                self.reward = 0
+                self.reward += 0
                 return True
             return False
 
@@ -73,12 +73,14 @@ class jigsaw_game:
     def get_state(self, action):
         is_moved = False
         action = int(np.where(action == 1)[0])
+        self.reward = -0.1 # Penalty for each step
         if(action < self.rows * self.cols):
             row = int(action / self.cols)
             col = int(action % self.cols)
             is_moved = self.move(col, row)
             if is_moved:
                 self.step +=  +1
+                self.reward += 1 # Reward for placing a piece
                 self.new_piece()
             else:
                 exit("ERROR action not allowed")
